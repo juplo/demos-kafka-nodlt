@@ -61,7 +61,7 @@ public class SimpleProducer
     final long time = System.currentTimeMillis();
 
     final ProducerRecord<String, String> record = new ProducerRecord<>(
-        "test", // Topic
+        topic,  // Topic
         key,    // Key
         value   // Value
     );
