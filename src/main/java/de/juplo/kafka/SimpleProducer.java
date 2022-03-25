@@ -6,12 +6,20 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 
 @Slf4j
 public class SimpleProducer
 {
-  public static void main(String[] args) throws Exception
+  private final String id;
+  private final String topic;
+  private final KafkaProducer<String, String> producer;
+
+  private long produced = 0;
+
+  public SimpleProducer(String clientId, String topic)
   {
     // tag::create[]
     Properties props = new Properties();
@@ -22,67 +30,88 @@ public class SimpleProducer
     KafkaProducer<String, String> producer = new KafkaProducer<>(props);
     // end::create[]
 
-    String id = "P";
+    this.id = clientId;
+    this.topic = topic;
+    this.producer = producer;
+  }
+
+  public void run()
+  {
     long i = 0;
 
     try
     {
       for (; i < 100 ; i++)
       {
-        final long time = System.currentTimeMillis();
-
-        final ProducerRecord<String, String> record = new ProducerRecord<>(
-            "test",              // Topic
-            Long.toString(i%10), // Key
-            Long.toString(i)     // Value
-        );
-
-        producer.send(record, (metadata, e) ->
-        {
-          long now = System.currentTimeMillis();
-          if (e == null)
-          {
-            // HANDLE SUCCESS
-            log.debug(
-                "{} - Sent key={} message={} partition={}/{} timestamp={} latency={}ms",
-                id,
-                record.key(),
-                record.value(),
-                metadata.partition(),
-                metadata.offset(),
-                metadata.timestamp(),
-                now - time
-            );
-          }
-          else
-          {
-            // HANDLE ERROR
-            log.error(
-                "{} - ERROR key={} timestamp={} latency={}ms: {}",
-                id,
-                record.key(),
-                metadata == null ? -1 : metadata.timestamp(),
-                now - time,
-                e.toString()
-            );
-          }
-        });
-
-        long now = System.currentTimeMillis();
-        log.trace(
-            "{} - Queued #{} key={} latency={}ms",
-            id,
-            i,
-            record.key(),
-            now - time
-        );
+        send(Long.toString(i%10), Long.toString(i));
       }
+
+      log.info("{} - Done", id);
     }
     finally
     {
       log.info("{}: Closing the KafkaProducer", id);
       producer.close();
-      log.info("{}: Exiting!", id);
+      log.info("{}: Produced {} messages in total, exiting!", id, produced);
     }
+  }
+
+  void send(String key, String value)
+  {
+    final long time = System.currentTimeMillis();
+
+    final ProducerRecord<String, String> record = new ProducerRecord<>(
+        "test", // Topic
+        key,    // Key
+        value   // Value
+    );
+
+    producer.send(record, (metadata, e) ->
+    {
+      long now = System.currentTimeMillis();
+      if (e == null)
+      {
+        // HANDLE SUCCESS
+        produced++;
+        log.debug(
+            "{} - Sent key={} message={} partition={}/{} timestamp={} latency={}ms",
+            id,
+            record.key(),
+            record.value(),
+            metadata.partition(),
+            metadata.offset(),
+            metadata.timestamp(),
+            now - time
+        );
+      }
+      else
+      {
+        // HANDLE ERROR
+        log.error(
+            "{} - ERROR key={} timestamp={} latency={}ms: {}",
+            id,
+            record.key(),
+            metadata == null ? -1 : metadata.timestamp(),
+            now - time,
+            e.toString()
+        );
+      }
+    });
+
+    long now = System.currentTimeMillis();
+    log.trace(
+        "{} - Queued #{} key={} latency={}ms",
+        id,
+        value,
+        record.key(),
+        now - time
+    );
+  }
+
+
+  public static void main(String[] args) throws Exception
+  {
+    SimpleProducer producer = new SimpleProducer("P", "test");
+    producer.run();
   }
 }
