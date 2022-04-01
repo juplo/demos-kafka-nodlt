@@ -15,7 +15,7 @@ trap 'kill $(jobs -p) 2>/dev/null' EXIT
 docker-compose up -d
 
 echo "Waiting for the Kafka-Cluster to become ready..."
-docker-compose exec kafka cub kafka-ready -b kafka:9092 1 60 > /dev/null 2>&1 || exit 1
+docker-compose exec cli cub kafka-ready -b kafka:9092 1 60 > /dev/null 2>&1 || exit 1
 
 echo "Producing messages"
 mvn exec:java@producer
