@@ -65,7 +65,7 @@ services:
     command: >
       bash -c "
         kafka-topics --bootstrap-server kafka:9092 --delete --if-exists --topic test
-        kafka-topics --bootstrap-server kafka:9092 --create --topic test --partitions 1 --replication-factor 3 --config min.insync.replicas=2
+        kafka-topics --bootstrap-server kafka:9092 --create --topic test --partitions 2 --replication-factor 3 --config min.insync.replicas=2
         kafka-topics --bootstrap-server kafka:9092 --describe --topic test
       "
 
