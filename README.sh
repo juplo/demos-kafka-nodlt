@@ -2,17 +2,14 @@
 
 if [ "$1" = "cleanup" ]
 then
-  docker-compose down -v
+  docker-compose down -v --remove-orphans
   exit
 fi
 
-docker-compose up -d
-
-echo "Waiting for the Kafka-Cluster to become ready..."
-docker-compose exec cli cub kafka-ready -b kafka:9092 1 60 > /dev/null 2>&1 || exit 1
-
+docker-compose up setup
 docker-compose ps
 
+docker-compose up -d cli
 echo
 echo "Hilfe-Ausgabe von kafkacat"
 echo
