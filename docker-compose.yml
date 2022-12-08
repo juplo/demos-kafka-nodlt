@@ -97,6 +97,7 @@ services:
       - kafka-1
       - kafka-2
       - kafka-3
+      - cli
 
   akhq:
     image: tchiotludo/akhq:0.23.0
