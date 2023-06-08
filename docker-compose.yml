@@ -91,13 +91,15 @@ services:
       bash -c "
         kafka-topics --bootstrap-server kafka:9092 --delete --if-exists --topic test
         kafka-topics --bootstrap-server kafka:9092 --create --topic test --partitions 2 --replication-factor 3 --config min.insync.replicas=2
+        echo Das Topic \'test\' wurde erfolgreich angelegt:
         kafka-topics --bootstrap-server kafka:9092 --describe --topic test
+        echo \'docker-compose restart -t0 setup\' löscht das Topic und legt es neu an
+        sleep infinity
       "
     depends_on:
       - kafka-1
       - kafka-2
       - kafka-3
-      - cli
 
   akhq:
     image: tchiotludo/akhq:0.23.0
@@ -119,6 +121,4 @@ services:
     image: juplo/toolbox
     command: sleep infinity
     depends_on:
-      - kafka-1
-      - kafka-2
-      - kafka-3
+      - setup
