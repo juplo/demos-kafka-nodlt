@@ -73,12 +73,26 @@ services:
     image: juplo/toolbox
     command: >
       bash -c "
-        kafka-topics --bootstrap-server kafka:9092 --delete --if-exists --topic test
-        kafka-topics --bootstrap-server kafka:9092 --create --topic test --partitions 2 --replication-factor 3 --config min.insync.replicas=2
-        echo Das Topic \'test\' wurde erfolgreich angelegt:
-        kafka-topics --bootstrap-server kafka:9092 --describe --topic test
-        echo \'docker-compose restart -t0 setup\' löscht das Topic und legt es neu an
-        sleep infinity
+        if [ -e INITIALIZED ]
+        then
+          echo -n Bereits konfiguriert: 
+          cat INITIALIZED
+          kafka-topics --bootstrap-server kafka:9092 --describe --topic test
+        else
+          kafka-topics --bootstrap-server kafka:9092 \
+                       --delete \
+                       --if-exists \
+                       --topic test
+          kafka-topics --bootstrap-server kafka:9092 \
+                       --create \
+                       --topic test \
+                       --partitions 2 \
+                       --replication-factor 3 \
+                       --config min.insync.replicas=2 \
+          && echo Das Topic \'test\' wurde erfolgreich angelegt: \
+          && kafka-topics --bootstrap-server kafka:9092 --describe --topic test \
+          && date > INITIALIZED
+        fi
       "
     depends_on:
       - kafka-1
