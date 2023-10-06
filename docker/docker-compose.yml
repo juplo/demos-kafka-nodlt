@@ -113,8 +113,10 @@ services:
 
   setup:
     image: juplo/toolbox
-    command: >
-      bash -c "
+    command:
+      - bash
+      - -c
+      - |
         if [ -e INITIALIZED ]
         then
           echo -n Bereits konfiguriert: 
@@ -135,7 +137,6 @@ services:
           && kafka-topics --bootstrap-server kafka:9092 --describe --topic test \
           && date > INITIALIZED
         fi
-      "
     depends_on:
       - kafka-1
       - kafka-2
