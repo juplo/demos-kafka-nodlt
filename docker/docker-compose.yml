@@ -114,6 +114,15 @@ services:
     depends_on:
       - schema-registry
 
+  cli:
+    image: juplo/toolbox
+    command: sleep infinity
+    stop_grace_period: 0s
+    depends_on:
+      - kafka-1
+      - kafka-2
+      - kafka-3
+
   setup:
     image: juplo/toolbox
     command:
@@ -143,9 +152,7 @@ services:
         fi
     stop_grace_period: 0s
     depends_on:
-      - kafka-1
-      - kafka-2
-      - kafka-3
+      - cli
 
   akhq:
     image: tchiotludo/akhq:0.23.0
@@ -167,13 +174,6 @@ services:
       - kafka-1
       - kafka-2
       - kafka-3
-
-  cli:
-    image: juplo/toolbox
-    command: sleep infinity
-    stop_grace_period: 0s
-    depends_on:
-      - setup
 
 volumes:
   zookeeper-data:
