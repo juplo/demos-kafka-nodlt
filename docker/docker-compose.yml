@@ -25,6 +25,7 @@ services:
       - kafka-1-data:/var/lib/kafka/data
     ports:
       - 9081:9081
+    stop_grace_period: 120s
     depends_on:
       - zookeeper
 
@@ -48,6 +49,7 @@ services:
       default:
         aliases:
           - kafka
+    stop_grace_period: 120s
     depends_on:
       - zookeeper
 
@@ -66,6 +68,7 @@ services:
       - kafka-3-data:/var/lib/kafka/data
     ports:
       - 9083:9083
+    stop_grace_period: 120s
     depends_on:
       - zookeeper
 
@@ -137,6 +140,7 @@ services:
           && kafka-topics --bootstrap-server kafka:9092 --describe --topic test \
           && date > INITIALIZED
         fi
+    stop_grace_period: 0s
     depends_on:
       - kafka-1
       - kafka-2
@@ -166,6 +170,7 @@ services:
   cli:
     image: juplo/toolbox
     command: sleep infinity
+    stop_grace_period: 0s
     depends_on:
       - setup
 
