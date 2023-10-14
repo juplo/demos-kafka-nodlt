@@ -120,6 +120,7 @@ services:
       - bash
       - -c
       - |
+        cub kafka-ready -b kafka-1:9092,kafka-2:9092,kafka-3:9092 3 60 > /dev/null 2>&1 || exit 1
         if [ -e INITIALIZED ]
         then
           echo -n Bereits konfiguriert: 
