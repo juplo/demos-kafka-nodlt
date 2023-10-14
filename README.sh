@@ -6,7 +6,7 @@ then
   exit
 fi
 
-docker-compose -f docker/docker-compose.yml up --remove-orphans setup
+docker-compose -f docker/docker-compose.yml up --remove-orphans setup || exit 1
 docker-compose -f docker/docker-compose.yml ps
 
 docker-compose -f docker/docker-compose.yml up -t0 -d cli
