@@ -6,7 +6,7 @@ then
   exit
 fi
 
-docker-compose -f docker/docker-compose.yml up -d --remove-orphans kafka-1 kafka-2 kafka-3
+docker-compose -f docker/docker-compose.yml up -d --remove-orphans zookeeper kafka-1 kafka-2 kafka-3
 docker-compose -f docker/docker-compose.yml ps
 echo "Waiting for the Kafka-Cluster to become ready..."
 docker-compose -f docker/docker-compose.yml run --rm cli cub kafka-ready -b kafka:9092 3 60 > /dev/null 2>&1 || exit 1
