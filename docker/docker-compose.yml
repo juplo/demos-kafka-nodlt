@@ -191,6 +191,16 @@ services:
     image: juplo/simple-consumer:1.0-SNAPSHOT
     command: kafka:9092 test my-group ute
 
+  spickzettel:
+    image: juplo/toolbox
+    command: >
+      bash -c '
+        kafka-console-consumer \
+          --bootstrap-server kafka:9092 \
+          --topic __consumer_offsets --from-beginning \
+          --formatter "kafka.coordinator.group.GroupMetadataManager\$$OffsetsMessageFormatter"
+      '
+
 volumes:
   controller-data:
   kafka-1-data:
