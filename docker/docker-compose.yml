@@ -1,7 +1,7 @@
 version: '3.2'
 services:
   zookeeper:
-    image: confluentinc/cp-zookeeper:7.5.1
+    image: confluentinc/cp-zookeeper:7.7.1
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
     ports:
@@ -11,7 +11,7 @@ services:
       - zookeeper-log:/var/lib/zookeeper/log
 
   kafka-1:
-    image: confluentinc/cp-kafka:7.5.1
+    image: confluentinc/cp-kafka:7.7.1
     environment:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_LISTENERS: BROKER://:9092, LOCALHOST://:9081
@@ -30,7 +30,7 @@ services:
       - zookeeper
 
   kafka-2:
-    image: confluentinc/cp-kafka:7.5.1
+    image: confluentinc/cp-kafka:7.7.1
     environment:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_LISTENERS: BROKER://:9092, LOCALHOST://:9082
@@ -54,7 +54,7 @@ services:
       - zookeeper
 
   kafka-3:
-    image: confluentinc/cp-kafka:7.5.1
+    image: confluentinc/cp-kafka:7.7.1
     environment:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_LISTENERS: BROKER://:9092, LOCALHOST://:9083
@@ -73,7 +73,7 @@ services:
       - zookeeper
 
   schema-registry:
-    image: confluentinc/cp-schema-registry:7.5.1
+    image: confluentinc/cp-schema-registry:7.7.1
     environment:
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka-1:9092,kafka-2:9092,kafka-3:9092
       SCHEMA_REGISTRY_HOST_NAME: schema-registry
@@ -87,7 +87,7 @@ services:
       - kafka-3
 
   connect:
-    image: confluentinc/cp-kafka-connect:7.5.1
+    image: confluentinc/cp-kafka-connect:7.7.1
     environment:
       CONNECT_BOOTSTRAP_SERVERS: kafka-1:9092,kafka-2:9092,kafka-3:9092
       CONNECT_REST_PORT: 8083
