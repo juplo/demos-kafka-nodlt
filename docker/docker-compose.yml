@@ -172,6 +172,10 @@ services:
       - kafka-2
       - kafka-3
 
+  producer:
+    image: juplo/simple-producer:1.0-SNAPSHOT
+    command: kafka:9092 test producer
+
 volumes:
   controller-data:
   kafka-1-data:

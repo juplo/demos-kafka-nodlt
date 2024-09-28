@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+      <Pattern>%highlight(%-5level) %m%n</Pattern>
+    </encoder>
+  </appender>
+
+  <logger name="de.juplo" level="TRACE"/>
+  <!-- logger name="org.apache.kafka.clients" level="DEBUG" / -->
+
+  <root level="INFO">
+    <appender-ref ref="STDOUT" />
+  </root>
+
+</configuration>
