@@ -37,6 +37,7 @@ public class ExampleConsumer
     props.put("partition.assignment.strategy", "org.apache.kafka.clients.consumer.CooperativeStickyAssignor");
     props.put("key.deserializer", StringDeserializer.class.getName());
     props.put("value.deserializer", StringDeserializer.class.getName());
+    props.put("metadata.maxage.ms", 5000);
 
     this.id = clientId;
     this.topic = topic;
