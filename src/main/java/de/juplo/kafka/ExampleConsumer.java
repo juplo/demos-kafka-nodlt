@@ -60,16 +60,12 @@ public class ExampleConsumer
         log.info("{} - Received {} messages", id, records.count());
         for (ConsumerRecord<String, String> record : records)
         {
-          consumed++;
-          log.info(
-            "{} - {}: {}/{} - {}={}",
-            id,
-            record.offset(),
+          handleRecord(
             record.topic(),
             record.partition(),
+            record.offset(),
             record.key(),
-            record.value()
-          );
+            record.value());
         }
       }
     }
@@ -89,6 +85,17 @@ public class ExampleConsumer
       consumer.close();
       log.info("{}: Consumed {} messages in total, exiting!", id, consumed);
     }
+  }
+
+  private void handleRecord(
+    String topic,
+    Integer partition,
+    Long offset,
+    String key,
+    String value)
+  {
+    consumed++;
+    log.info("{} - {}: {}/{} - {}={}", id, offset, topic, partition, key, value);
   }
 
 
