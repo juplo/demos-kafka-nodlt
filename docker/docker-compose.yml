@@ -20,6 +20,7 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: BROKER
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+      KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS: 1000
     volumes:
       - kafka-1-data:/var/lib/kafka/data
     ports:
@@ -39,6 +40,7 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: BROKER
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+      KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS: 10000
     volumes:
       - kafka-2-data:/var/lib/kafka/data
     ports:
@@ -63,6 +65,7 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: BROKER
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+      KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS: 10000
     volumes:
       - kafka-3-data:/var/lib/kafka/data
     ports:
