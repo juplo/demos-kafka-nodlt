@@ -1,47 +1,46 @@
 package de.juplo.kafka;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.clients.consumer.Consumer;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.errors.WakeupException;
-import org.apache.kafka.common.serialization.StringDeserializer;
 
 import java.time.Duration;
 import java.util.Arrays;
-import java.util.Properties;
 
 
 @Slf4j
-public class ExampleConsumer
+public class ExampleConsumer implements Runnable
 {
   private final String id;
   private final String topic;
   private final Consumer<String, String> consumer;
+  private final Thread workerThread;
+  private final Runnable closeCallback;
 
   private volatile boolean running = false;
   private long consumed = 0;
 
-  public ExampleConsumer(
-    String broker,
-    String topic,
-    String groupId,
-    String clientId)
-  {
-    Properties props = new Properties();
-    props.put("bootstrap.servers", broker);
-    props.put("group.id", groupId); // ID für die Offset-Commits
-    props.put("client.id", clientId); // Nur zur Wiedererkennung
-    props.put("key.deserializer", StringDeserializer.class.getName());
-    props.put("value.deserializer", StringDeserializer.class.getName());
 
+  public ExampleConsumer(
+    String clientId,
+    String topic,
+    Consumer<String, String> consumer,
+    Runnable closeCallback)
+  {
     this.id = clientId;
     this.topic = topic;
-    consumer = new KafkaConsumer<>(props);
+    this.consumer = consumer;
+
+    workerThread = new Thread(this, "ExampleConsumer Worker-Thread");
+    workerThread.start();
+
+    this.closeCallback = closeCallback;
   }
 
 
+  @Override
   public void run()
   {
     try
@@ -50,7 +49,7 @@ public class ExampleConsumer
       consumer.subscribe(Arrays.asList(topic));
       running = true;
 
-      while (true)
+      while (running)
       {
         ConsumerRecords<String, String> records = consumer.poll(Duration.ofSeconds(1));
 
@@ -74,6 +73,8 @@ public class ExampleConsumer
     {
       log.error("{} - Unexpected error, unsubscribing!", id, e);
       consumer.unsubscribe();
+      log.info("{} - Triggering exit of application!", id);
+      new Thread(closeCallback).start();
     }
     finally
     {
@@ -96,46 +97,11 @@ public class ExampleConsumer
   }
 
 
-  public static void main(String[] args) throws Exception
+  public void shutdown() throws InterruptedException
   {
-    if (args.length != 4)
-    {
-      log.error("Four arguments required!");
-      log.error("args[0]: Broker-Address");
-      log.error("args[1]: Topic");
-      log.error("args[2]: Group-ID");
-      log.error("args[3]: Unique Client-ID");
-      System.exit(1);
-      return;
-    }
-
-
-    log.info(
-      "Running ExampleConsumer: broker={}, topic={}, group-id={}, client-id={}",
-      args[0],
-      args[1],
-      args[2],
-      args[3]);
-
-    ExampleConsumer instance = new ExampleConsumer(args[0], args[1], args[2], args[3]);
-
-    Runtime.getRuntime().addShutdownHook(new Thread(() ->
-    {
-      instance.consumer.wakeup();
-
-      while (instance.running)
-      {
-        log.info("{} - Waiting for main-thread...", instance.id);
-        try
-        {
-          Thread.sleep(1000);
-        }
-        catch (InterruptedException e) {}
-      }
-      log.info("{} - Shutdown completed.", instance.id);
-    }));
-
-    instance.run();
+    log.info("{} joining the worker-thread...", id);
+    running = false;
+    consumer.wakeup();
+    workerThread.join();
   }
 }
-

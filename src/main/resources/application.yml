@@ -1,0 +1,37 @@
+juplo:
+  bootstrap-server: :9092
+  client-id: DEV
+  consumer:
+    group-id: my-group
+    topic: test
+    auto-offset-reset: earliest
+    auto-commit-interval: 5s
+management:
+  endpoint:
+    shutdown:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  info:
+    env:
+      enabled: true
+    java:
+      enabled: true
+info:
+  kafka:
+    bootstrap-server: ${juplo.bootstrap-server}
+    client-id: ${juplo.client-id}
+    consumer:
+      group-id: ${juplo.consumer.group-id}
+      topic: ${juplo.consumer.topic}
+      auto-offset-reset: ${juplo.consumer.auto-offset-reset}
+      auto-commit-interval: ${juplo.consumer.auto-commit-interval}
+logging:
+  level:
+    root: INFO
+    de.juplo: DEBUG
+    org.springframework.kafka: INFO
+server:
+  port: 8881

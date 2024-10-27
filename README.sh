@@ -1,6 +1,6 @@
 #!/bin/bash
 
-IMAGE=juplo/simple-consumer:1.0-SNAPSHOT
+IMAGE=juplo/spring-consumer:1.1-SNAPSHOT
 
 if [ "$1" = "cleanup" ]
 then

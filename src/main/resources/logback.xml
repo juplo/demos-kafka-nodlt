@@ -7,8 +7,6 @@
     </encoder>
   </appender>
 
-  <logger name="de.juplo" level="TRACE"/>
-
   <root level="INFO">
     <appender-ref ref="STDOUT" />
   </root>

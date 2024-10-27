@@ -1,0 +1,52 @@
+package de.juplo.kafka;
+
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
+
+import java.time.Duration;
+
+
+@ConfigurationProperties(prefix = "juplo")
+@Validated
+@Getter
+@Setter
+public class ApplicationProperties
+{
+  @NotNull
+  @NotEmpty
+  private String bootstrapServer;
+  @NotNull
+  @NotEmpty
+  private String clientId;
+
+  @NotNull
+  private ConsumerProperties consumer;
+
+
+  public ConsumerProperties getConsumerProperties()
+  {
+    return consumer;
+  }
+
+
+  @Validated
+  @Getter
+  @Setter
+  static class ConsumerProperties
+  {
+    @NotNull
+    @NotEmpty
+    private String groupId;
+    @NotNull
+    @NotEmpty
+    private String topic;
+    private OffsetReset autoOffsetReset;
+    private Duration autoCommitInterval;
+
+    enum OffsetReset { latest, earliest, none }
+  }
+}

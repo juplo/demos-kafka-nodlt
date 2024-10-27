@@ -180,26 +180,25 @@ services:
     mem_limit:  100m
 
   consumer:
-    image: juplo/simple-consumer:1.0-SNAPSHOT
-    command: kafka:9092 test my-group consumer
+    image: juplo/spring-consumer:1.1-SNAPSHOT
+    environment:
+      juplo.bootstrap-server: kafka:9092
+      juplo.client-id: consumer
+      juplo.consumer.topic: test
 
   peter:
-    image: juplo/simple-consumer:1.0-SNAPSHOT
-    command: kafka:9092 test my-group peter
+    image: juplo/spring-consumer:1.1-SNAPSHOT
+    environment:
+      juplo.bootstrap-server: kafka:9092
+      juplo.client-id: peter
+      juplo.consumer.topic: test
 
   ute:
-    image: juplo/simple-consumer:1.0-SNAPSHOT
-    command: kafka:9092 test my-group ute
-
-  spickzettel:
-    image: juplo/toolbox
-    command: >
-      bash -c '
-        kafka-console-consumer \
-          --bootstrap-server kafka:9092 \
-          --topic __consumer_offsets --from-beginning \
-          --formatter "kafka.coordinator.group.GroupMetadataManager\$$OffsetsMessageFormatter"
-      '
+    image: juplo/spring-consumer:1.1-SNAPSHOT
+    environment:
+      juplo.bootstrap-server: kafka:9092
+      juplo.client-id: ute
+      juplo.consumer.topic: test
 
 volumes:
   controller-data:
