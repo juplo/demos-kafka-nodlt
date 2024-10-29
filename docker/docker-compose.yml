@@ -183,6 +183,14 @@ services:
     image: juplo/simple-consumer:1.0-SNAPSHOT
     command: kafka:9092 test my-group consumer
 
+  peter:
+    image: juplo/simple-consumer:1.0-SNAPSHOT
+    command: kafka:9092 test my-group peter
+
+  ute:
+    image: juplo/simple-consumer:1.0-SNAPSHOT
+    command: kafka:9092 test my-group ute
+
 volumes:
   controller-data:
   kafka-1-data:
