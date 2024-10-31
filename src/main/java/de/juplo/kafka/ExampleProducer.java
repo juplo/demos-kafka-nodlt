@@ -79,7 +79,7 @@ public class ExampleProducer
         // HANDLE SUCCESS
         produced++;
         log.debug(
-            "{} - Sent key={} message={} partition={}/{} timestamp={} latency={}ms",
+            "{} - Sent message {}={}, partition={}:{}, timestamp={}, latency={}ms",
             id,
             record.key(),
             record.value(),
@@ -93,9 +93,10 @@ public class ExampleProducer
       {
         // HANDLE ERROR
         log.error(
-            "{} - ERROR key={} timestamp={} latency={}ms: {}",
+            "{} - ERROR for message {}={}, timestamp={}, latency={}ms: {}",
             id,
             record.key(),
+            record.value(),
             metadata == null ? -1 : metadata.timestamp(),
             now - time,
             e.toString()
@@ -105,9 +106,10 @@ public class ExampleProducer
 
     long now = System.currentTimeMillis();
     log.trace(
-        "{} - Queued message with key={} latency={}ms",
+        "{} - Queued message {}={}, latency={}ms",
         id,
         record.key(),
+        record.value(),
         now - time
     );
   }
