@@ -50,7 +50,7 @@ public class ExampleProducer
     }
     catch (Exception e)
     {
-      log.error("{} - Unexpected error: {}!", id, e.toString());
+      log.error("{} - Unexpected error!", id, e);
     }
     finally
     {
