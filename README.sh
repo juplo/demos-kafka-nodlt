@@ -5,7 +5,7 @@ IMAGE=juplo/simple-producer:1.0-SNAPSHOT
 if [ "$1" = "cleanup" ]
 then
   docker compose -f docker/docker-compose.yml down -t0 -v --remove-orphans
-  mvn clean
+  ./mvnw clean
   exit
 fi
 
@@ -17,7 +17,7 @@ if [[
   "$1" = "build"
 ]]
 then
-  mvn clean install || exit
+  ./mvnw clean install || exit
 else
   echo "Using image existing images:"
   docker image ls $IMAGE
