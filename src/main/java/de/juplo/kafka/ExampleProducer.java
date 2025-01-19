@@ -81,8 +81,8 @@ public class ExampleProducer
         log.debug(
             "{} - Sent message {}={}, partition={}:{}, timestamp={}, latency={}ms",
             id,
-            record.key(),
-            record.value(),
+            key,
+            value,
             metadata.partition(),
             metadata.offset(),
             metadata.timestamp(),
@@ -93,11 +93,10 @@ public class ExampleProducer
       {
         // HANDLE ERROR
         log.error(
-            "{} - ERROR for message {}={}, timestamp={}, latency={}ms: {}",
+            "{} - ERROR for message {}={}, latency={}ms: {}",
             id,
-            record.key(),
-            record.value(),
-            metadata == null ? -1 : metadata.timestamp(),
+            key,
+            value,
             now - time,
             e.toString()
         );
@@ -108,8 +107,8 @@ public class ExampleProducer
     log.trace(
         "{} - Queued message {}={}, latency={}ms",
         id,
-        record.key(),
-        record.value(),
+        key,
+        value,
         now - time
     );
   }
