@@ -95,7 +95,7 @@ public class ExampleConsumer
     String value)
   {
     consumed++;
-    log.info("{} - {}: {}/{} - {}={}", id, offset, topic, partition, key, value);
+    log.info("{} - partition={}-{}, offset={}: {}={}", id, topic, partition, offset, key, value);
   }
 
 
