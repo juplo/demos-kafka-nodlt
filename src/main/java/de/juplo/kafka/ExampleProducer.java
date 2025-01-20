@@ -79,7 +79,7 @@ public class ExampleProducer
         // HANDLE SUCCESS
         produced++;
         log.debug(
-            "{} - Sent message {}={}, partition={}:{}, timestamp={}, latency={}ms",
+            "{} - Sent message {}={}, partition={}, offset={}, timestamp={}, latency={}ms",
             id,
             key,
             value,
