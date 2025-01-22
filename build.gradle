@@ -1,7 +1,10 @@
+import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
+
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.4.1'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'com.bmuschko.docker-remote-api' version '9.3.3'
 }
 
 group = 'de.juplo.kafka'
@@ -28,4 +31,37 @@ dependencies {
 	implementation 'ch.qos.logback:logback-classic'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
+}
+
+docker {
+	// Optional: Konfiguriere den Docker-Host, falls nötig
+	// url = 'unix:///var/run/docker.sock' (Standard)
+}
+
+
+def targetDir = file("${projectDir}/target")
+def appJarName = "${project.name}-${project.version}.jar"
+
+// Task zum Bereinigen des `target`-Verzeichnisses bei `clean`
+clean {
+	delete targetDir
+}
+
+// Task zum Kopieren des Haupt-JARs
+task copyJar(type: Copy) {
+	from "$buildDir/libs/${appJarName}"
+	into targetDir
+	dependsOn build
+
+	doFirst {
+		def libs = file("${targetDir}/libs")
+		mkdir(libs)
+	}
+}
+
+// Docker-Task
+task buildDockerImage(type: DockerBuildImage) {
+	inputDir = file('.')
+	images = ["juplo/${project.name}:${project.version}"]
+	dependsOn copyJar
 }
