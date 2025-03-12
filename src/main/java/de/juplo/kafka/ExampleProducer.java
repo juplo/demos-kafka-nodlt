@@ -116,21 +116,23 @@ public class ExampleProducer
 
   public static void main(String[] args) throws Exception
   {
-    String broker = ":9092";
-    String topic = "test";
-    String clientId = "DEV";
-
-    switch (args.length)
+    if (args.length != 3)
     {
-      case 3:
-        clientId = args[2];
-      case 2:
-        topic = args[1];
-      case 1:
-        broker = args[0];
+      log.error("Three arguments required!");
+      log.error("arg[0]: Broker-Address");
+      log.error("arg[1]: Topic");
+      log.error("arg[2]: Unique Client-ID");
+      System.exit(1);
+      return;
     }
 
-    ExampleProducer instance = new ExampleProducer(broker, topic, clientId);
+    log.info(
+      "Running ExampleProducer: broker={}, topic={}, client-id={}",
+      args[0],
+      args[1],
+      args[2]);
+
+    ExampleProducer instance = new ExampleProducer(args[0], args[1], args[2]);
 
     Runtime.getRuntime().addShutdownHook(new Thread(() ->
     {
@@ -147,11 +149,6 @@ public class ExampleProducer
       log.info("Shutdown completed.");
     }));
 
-    log.info(
-      "Running ExampleProducer: broker={}, topic={}, client-id={}",
-      broker,
-      topic,
-      clientId);
     instance.run();
   }
 }
