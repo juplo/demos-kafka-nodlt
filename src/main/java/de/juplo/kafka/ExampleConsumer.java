@@ -98,25 +98,26 @@ public class ExampleConsumer
 
   public static void main(String[] args) throws Exception
   {
-    String broker = ":9092";
-    String topic = "test";
-    String groupId = "my-group";
-    String clientId = "DEV";
-
-    switch (args.length)
+    if (args.length != 4)
     {
-      case 4:
-        clientId = args[3];
-      case 3:
-        groupId = args[2];
-      case 2:
-        topic = args[1];
-      case 1:
-        broker = args[0];
+      log.error("Four arguments required!");
+      log.error("args[0]: Broker-Address");
+      log.error("args[1]: Topic");
+      log.error("args[2]: Group-ID");
+      log.error("args[3]: Unique Client-ID");
+      System.exit(1);
+      return;
     }
 
 
-    ExampleConsumer instance = new ExampleConsumer(broker, topic, groupId, clientId);
+    log.info(
+      "Running ExampleConsumer: broker={}, topic={}, group-id={}, client-id={}",
+      args[0],
+      args[1],
+      args[2],
+      args[3]);
+
+    ExampleConsumer instance = new ExampleConsumer(args[0], args[1], args[2], args[3]);
 
     Runtime.getRuntime().addShutdownHook(new Thread(() ->
     {
@@ -134,12 +135,7 @@ public class ExampleConsumer
       log.info("{} - Shutdown completed.", instance.id);
     }));
 
-    log.info(
-      "Running ExampleConsumer: broker={}, topic={}, group-id={}, client-id={}",
-      broker,
-      topic,
-      groupId,
-      clientId);
     instance.run();
   }
 }
+  
