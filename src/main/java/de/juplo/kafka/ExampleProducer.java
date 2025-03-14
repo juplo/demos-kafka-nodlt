@@ -77,7 +77,6 @@ public class ExampleProducer
       if (e == null)
       {
         // HANDLE SUCCESS
-        produced++;
         log.debug(
           "{} - Sent message {}={}, partition={}, offset={}, timestamp={}, latency={}ms",
           id,
@@ -104,6 +103,7 @@ public class ExampleProducer
     });
 
     long now = System.currentTimeMillis();
+    produced++;
     log.trace(
       "{} - Queued message {}={}, latency={}ms",
       id,
