@@ -19,7 +19,6 @@ public class ExampleConsumer implements Runnable
   private final Thread workerThread;
   private final Runnable closeCallback;
 
-  private volatile boolean running = false;
   private long consumed = 0;
 
 
@@ -47,9 +46,8 @@ public class ExampleConsumer implements Runnable
     {
       log.info("{} - Subscribing to topic {}", id, topic);
       consumer.subscribe(Arrays.asList(topic));
-      running = true;
 
-      while (running)
+      while (true)
       {
         ConsumerRecords<String, String> records = consumer.poll(Duration.ofSeconds(1));
 
@@ -81,7 +79,6 @@ public class ExampleConsumer implements Runnable
       log.info("{} - Closing the KafkaConsumer", id);
       consumer.close();
       log.info("{}: Consumed {} messages in total, exiting!", id, consumed);
-      running = false;
     }
   }
 
@@ -99,9 +96,9 @@ public class ExampleConsumer implements Runnable
 
   public void shutdown() throws InterruptedException
   {
-    log.info("{} joining the worker-thread...", id);
-    running = false;
+    log.info("{} - Waking up the consumer", id);
     consumer.wakeup();
+    log.info("{} - Joining the worker thread", id);
     workerThread.join();
   }
 }
