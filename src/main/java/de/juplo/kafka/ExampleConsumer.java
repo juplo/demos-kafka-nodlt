@@ -77,10 +77,10 @@ public class ExampleConsumer
     }
     finally
     {
-      running = false;
       log.info("{} - Closing the KafkaConsumer", id);
       consumer.close();
       log.info("{}: Consumed {} messages in total, exiting!", id, consumed);
+      running = false;
     }
   }
 
@@ -138,4 +138,4 @@ public class ExampleConsumer
     instance.run();
   }
 }
-  
+
