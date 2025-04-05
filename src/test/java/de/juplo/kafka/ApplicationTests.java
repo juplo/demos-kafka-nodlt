@@ -1,6 +1,7 @@
 package de.juplo.kafka;
 
 import com.jayway.jsonpath.JsonPath;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.resttestclient.TestRestTemplate;
@@ -29,12 +30,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureTestRestTemplate
 public class ApplicationTests
 {
+  @DisplayName("Application startup")
   @Test
   public void testApplicationStartup()
   {
     ResponseEntity<String> response = restTemplate.getForEntity("/actuator/health", String.class);
     assertThat(response.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(HttpStatus.OK.value()));
     assertThat(JsonPath.parse(response.getBody()).read("$.status", String.class)).isEqualTo("UP");
+  }
+
+  @DisplayName("Not yet existing offset")
+  @Test
+  void testNotYetExistingOffset()
+  {
+    ResponseEntity<String> response = restTemplate.getForEntity("/1/66666666666", String.class);
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()));
   }
 
 
