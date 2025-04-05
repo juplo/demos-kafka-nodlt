@@ -200,6 +200,15 @@ services:
       juplo.client-id: ute
       juplo.consumer.topic: test
 
+  nodlt:
+    image: juplo/nodlt:1.0-SNAPSHOT
+    environment:
+      juplo.bootstrap-server: kafka:9092
+      juplo.client-id: ute
+      juplo.consumer.topic: test
+    ports:
+      - 8881:8881
+
 volumes:
   controller-data:
   kafka-1-data:

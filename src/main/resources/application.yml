@@ -2,10 +2,8 @@ juplo:
   bootstrap-server: :9092
   client-id: DEV
   consumer:
-    group-id: my-group
+    group-id: nodlt
     topic: test
-    auto-offset-reset: earliest
-    auto-commit-interval: 5s
 management:
   endpoint:
     shutdown:
@@ -26,8 +24,6 @@ info:
     consumer:
       group-id: ${juplo.consumer.group-id}
       topic: ${juplo.consumer.topic}
-      auto-offset-reset: ${juplo.consumer.auto-offset-reset}
-      auto-commit-interval: ${juplo.consumer.auto-commit-interval}
 logging:
   level:
     root: INFO

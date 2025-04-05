@@ -16,7 +16,7 @@ import java.util.Properties;
 public class ApplicationConfiguration
 {
   @Bean
-  public DeadLetterConsumer exampleConsumer(
+  public DeadLetterConsumer deadLetterConsumer(
     Consumer<String, String> kafkaConsumer,
     ApplicationProperties properties,
     ConfigurableApplicationContext applicationContext)
@@ -33,20 +33,13 @@ public class ApplicationConfiguration
   public KafkaConsumer<String, String> kafkaConsumer(ApplicationProperties properties)
   {
     Properties props = new Properties();
+
     props.put("bootstrap.servers", properties.getBootstrapServer());
     props.put("client.id", properties.getClientId());
     props.put("group.id", properties.getConsumerProperties().getGroupId());
-    if (properties.getConsumerProperties().getAutoOffsetReset() != null)
-    {
-      props.put("auto.offset.reset", properties.getConsumerProperties().getAutoOffsetReset().name());
-    }
-    if (properties.getConsumerProperties().getAutoCommitInterval() != null)
-    {
-      props.put("auto.commit.interval", properties.getConsumerProperties().getAutoCommitInterval());
-    }
-    props.put("metadata.max.age.ms", 5000); //  5 Sekunden
     props.put("key.deserializer", StringDeserializer.class.getName());
     props.put("value.deserializer", StringDeserializer.class.getName());
+    props.put("auto.offset.reset", "none");
 
     return new KafkaConsumer<>(props);
   }

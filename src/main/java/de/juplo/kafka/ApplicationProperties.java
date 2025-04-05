@@ -7,8 +7,6 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
-import java.time.Duration;
-
 
 @ConfigurationProperties(prefix = "juplo")
 @Validated
@@ -44,9 +42,5 @@ public class ApplicationProperties
     @NotNull
     @NotEmpty
     private String topic;
-    private OffsetReset autoOffsetReset;
-    private Duration autoCommitInterval;
-
-    enum OffsetReset { latest, earliest, none }
   }
 }
