@@ -11,7 +11,7 @@ import java.util.Arrays;
 
 
 @Slf4j
-public class ExampleConsumer implements Runnable
+public class DeadLetterConsumer implements Runnable
 {
   private final String id;
   private final String topic;
@@ -22,7 +22,7 @@ public class ExampleConsumer implements Runnable
   private long consumed = 0;
 
 
-  public ExampleConsumer(
+  public DeadLetterConsumer(
     String clientId,
     String topic,
     Consumer<String, String> consumer,

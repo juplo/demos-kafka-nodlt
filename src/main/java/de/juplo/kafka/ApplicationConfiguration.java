@@ -16,13 +16,13 @@ import java.util.Properties;
 public class ApplicationConfiguration
 {
   @Bean
-  public ExampleConsumer exampleConsumer(
+  public DeadLetterConsumer exampleConsumer(
     Consumer<String, String> kafkaConsumer,
     ApplicationProperties properties,
     ConfigurableApplicationContext applicationContext)
   {
     return
-      new ExampleConsumer(
+      new DeadLetterConsumer(
         properties.getClientId(),
         properties.getConsumerProperties().getTopic(),
         kafkaConsumer,
