@@ -30,6 +30,7 @@ docker compose -f docker/docker-compose.yml up -d producer consumer nodlt
 while ! [[ $(http 0:8881/actuator/health 2> /dev/null) =~ "UP" ]]; do echo "Waiting for nodlt..."; sleep 1; done
 
 http -v :8881/0/0
+http -v :8881/1/666
 http -v :8881/1/3
 
 docker compose -f docker/docker-compose.yml stop producer consumer

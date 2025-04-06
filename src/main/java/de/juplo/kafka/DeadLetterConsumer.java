@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.OffsetOutOfRangeException;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.WakeupException;
 import reactor.core.publisher.Mono;
@@ -128,6 +129,24 @@ public class DeadLetterConsumer implements Runnable
 
           consumer.resume(partitionsToResume);
         }
+        catch (OffsetOutOfRangeException e)
+        {
+          List<TopicPartition> partitionsToPause = new LinkedList<>();
+
+          e.offsetOutOfRangePartitions().forEach((topicPartition, offset) ->
+          {
+            FetchRequest failedFetchRequest = currentFetchRequest[topicPartition.partition()];
+            log.error("{} - {} does not yet exist: {}", id, failedFetchRequest, e.toString());
+            failedFetchRequest.future().completeExceptionally(e);
+            Optional<FetchRequest> fetchRequestMono = schedulePendingFetchRequest(topicPartition.partition(), true);
+            if (fetchRequestMono.isEmpty())
+            {
+              partitionsToPause.add(topicPartition);
+            }
+          });
+
+          consumer.pause(partitionsToPause);
+        }
       }
     }
     catch(Exception e)
@@ -145,9 +164,15 @@ public class DeadLetterConsumer implements Runnable
     }
   }
 
+
   private Optional<FetchRequest> schedulePendingFetchRequest(int partition)
   {
-    if (currentFetchRequest[partition] == null)
+    return schedulePendingFetchRequest(partition, false);
+  }
+
+  private Optional<FetchRequest> schedulePendingFetchRequest(int partition, boolean force)
+  {
+    if (force || currentFetchRequest[partition] == null)
     {
       FetchRequest nextFetchRequest = pendingFetchRequests[partition].poll();
       if (nextFetchRequest != null)
@@ -158,6 +183,7 @@ public class DeadLetterConsumer implements Runnable
       else
       {
         log.trace("{} - no pending fetch-request for partition {}.", id, partition);
+        currentFetchRequest[partition] = null;
       }
     }
     else

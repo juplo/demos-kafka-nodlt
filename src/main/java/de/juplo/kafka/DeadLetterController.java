@@ -1,9 +1,9 @@
 package de.juplo.kafka;
 
+import org.apache.kafka.clients.consumer.OffsetOutOfRangeException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 
@@ -20,5 +20,11 @@ public class DeadLetterController
     @PathVariable long offset)
   {
     return deadLetterConsumer.requestRecord(partition, offset);
+  }
+
+  @ResponseStatus(value= HttpStatus.NOT_FOUND)
+  @ExceptionHandler(OffsetOutOfRangeException.class)
+  public void notFound(OffsetOutOfRangeException e)
+  {
   }
 }
