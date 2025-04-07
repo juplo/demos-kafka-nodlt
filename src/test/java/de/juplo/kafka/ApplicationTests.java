@@ -73,11 +73,22 @@ public class ApplicationTests
     SendResult<byte[], byte[]> result = send(partition);
 
     RecordMetadata recordMetadata = result.getRecordMetadata();
-    ResponseEntity<String> response = restTemplate.getForEntity(
+    ResponseEntity<String> response = fetchRecord(recordMetadata);
+    check(result, response);
+  }
+
+  private ResponseEntity<String> fetchRecord(RecordMetadata recordMetadata)
+  {
+    return restTemplate.getForEntity(
       "/{partition}/{offset}",
       String.class,
       recordMetadata.partition(),
       recordMetadata.offset());
+  }
+
+  private void check(SendResult<byte[], byte[]> result, ResponseEntity<String> response)
+  {
+    RecordMetadata recordMetadata = result.getRecordMetadata();
 
     String key = new String(result.getProducerRecord().key());
     String value = new String(result.getProducerRecord().value());
