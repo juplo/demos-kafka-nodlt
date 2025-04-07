@@ -55,8 +55,10 @@ public class ApplicationTests
   public void testApplicationStartup()
   {
     ResponseEntity<String> response = restTemplate.getForEntity("/actuator/health", String.class);
-    assertThat(response.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(HttpStatus.OK.value()));
-    assertThat(JsonPath.parse(response.getBody()).read("$.status", String.class)).isEqualTo("UP");
+    assertThat(response.getStatusCode())
+      .isEqualTo(HttpStatusCode.valueOf(HttpStatus.OK.value()));
+    assertThat(JsonPath.parse(response.getBody()).read("$.status", String.class))
+      .isEqualTo("UP");
   }
 
   @DisplayName("Existing offset")
@@ -72,8 +74,10 @@ public class ApplicationTests
       String.class,
       recordMetadata.partition(),
       recordMetadata.offset());
-    assertThat(response.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(HttpStatus.OK.value()));
-    assertThat(response.getBody()).isEqualTo(value);
+    assertThat(response.getStatusCode())
+      .isEqualTo(HttpStatusCode.valueOf(HttpStatus.OK.value()));
+    assertThat(response.getBody())
+      .isEqualTo(value);
   }
 
   @DisplayName("Not yet existing offset")
@@ -82,7 +86,8 @@ public class ApplicationTests
   void testNotYetExistingOffset(int partition)
   {
     ResponseEntity<String> response = restTemplate.getForEntity("/{partition}/666", String.class, partition);
-    assertThat(response.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()));
+    assertThat(response.getStatusCode())
+      .isEqualTo(HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()));
   }
 
   @DisplayName("Already deleted offset")
@@ -97,7 +102,8 @@ public class ApplicationTests
       String.class,
       recordMetadata.partition(),
       recordMetadata.offset());
-    assertThat(response.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()));
+    assertThat(response.getStatusCode())
+      .isEqualTo(HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()));
   }
 
   @DisplayName("Non-existent partition")
@@ -106,7 +112,8 @@ public class ApplicationTests
   void testNonExistentPartition(int partition)
   {
     ResponseEntity<String> response = restTemplate.getForEntity("/{partition}/0", String.class, partition);
-    assertThat(response.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(HttpStatus.BAD_REQUEST.value()));
+    assertThat(response.getStatusCode())
+      .isEqualTo(HttpStatusCode.valueOf(HttpStatus.BAD_REQUEST.value()));
   }
 
 
