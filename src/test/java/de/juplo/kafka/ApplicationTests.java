@@ -10,6 +10,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.resttestclient.TestRestTemplate;
 import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate;
@@ -75,6 +77,15 @@ public class ApplicationTests
       String.class,
       recordMetadata.partition(),
       recordMetadata.offset());
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()));
+  }
+
+  @DisplayName("Non-existent partition")
+  @ParameterizedTest(name = "partition: {0}")
+  @ValueSource(ints = { -1, NUM_PARTITIONS, 66 })
+  void testNonExistentPartition(int partition)
+  {
+    ResponseEntity<String> response = restTemplate.getForEntity("/{partition}/0", String.class, partition);
     assertThat(response.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()));
   }
 
