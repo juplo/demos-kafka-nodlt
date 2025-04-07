@@ -1,5 +1,6 @@
 package de.juplo.kafka;
 
+import de.juplo.kafka.exceptions.NonExistentPartitionException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -203,6 +204,11 @@ public class DeadLetterConsumer implements Runnable
   }
   Mono<String> requestRecord(int partition, long offset)
   {
+    if (partition >= numPartitions || partition < 0)
+    {
+      throw new NonExistentPartitionException(topic, partition);
+    }
+
     CompletableFuture<String> future = new CompletableFuture<>();
 
     FetchRequest fetchRequest = new FetchRequest(

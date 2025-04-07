@@ -1,5 +1,6 @@
 package de.juplo.kafka;
 
+import de.juplo.kafka.exceptions.NonExistentPartitionException;
 import org.apache.kafka.clients.consumer.OffsetOutOfRangeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,12 @@ public class DeadLetterController
   @ResponseStatus(value= HttpStatus.NOT_FOUND)
   @ExceptionHandler(OffsetOutOfRangeException.class)
   public void notFound(OffsetOutOfRangeException e)
+  {
+  }
+
+  @ResponseStatus(value= HttpStatus.BAD_REQUEST)
+  @ExceptionHandler(NonExistentPartitionException.class)
+  public void badRequest(NonExistentPartitionException e)
   {
   }
 }

@@ -86,7 +86,7 @@ public class ApplicationTests
   void testNonExistentPartition(int partition)
   {
     ResponseEntity<String> response = restTemplate.getForEntity("/{partition}/0", String.class, partition);
-    assertThat(response.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()));
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(HttpStatus.BAD_REQUEST.value()));
   }
 
 
