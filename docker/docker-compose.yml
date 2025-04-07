@@ -206,6 +206,7 @@ services:
       juplo.bootstrap-server: kafka:9092
       juplo.client-id: ute
       juplo.consumer.topic: test
+      juplo.controller.media-type: text/plain
     ports:
       - 8881:8881
 

@@ -5,6 +5,8 @@ juplo:
     group-id: nodlt
     topic: test
     header-prefix: X-RECORD-
+  controller:
+    media-type: application/json
 management:
   endpoint:
     shutdown:

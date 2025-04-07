@@ -2,8 +2,8 @@ package de.juplo.kafka;
 
 import de.juplo.kafka.exceptions.NonExistentPartitionException;
 import org.apache.kafka.clients.consumer.OffsetOutOfRangeException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriUtils;
@@ -15,8 +15,17 @@ import java.nio.charset.StandardCharsets;
 @RestController
 public class DeadLetterController
 {
-  @Autowired
-  DeadLetterConsumer deadLetterConsumer;
+  private final DeadLetterConsumer deadLetterConsumer;
+  private final MediaType mediaType;
+
+
+  public DeadLetterController(
+    DeadLetterConsumer deadLetterConsumer,
+    ApplicationProperties properties)
+  {
+    this.deadLetterConsumer = deadLetterConsumer;
+    this.mediaType = properties.getController().getMediaType();
+  }
 
 
   @GetMapping(path = "/{partition}/{offset}")
@@ -28,6 +37,7 @@ public class DeadLetterController
       .requestRecord(partition, offset)
       .map(record -> ResponseEntity
         .ok()
+        .contentType(mediaType)
         .header(
           deadLetterConsumer.prefixed(DeadLetterConsumer.KEY),
           UriUtils.encodePathSegment(record.key(), StandardCharsets.UTF_8))

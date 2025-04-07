@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 
 
@@ -22,13 +23,15 @@ public class ApplicationProperties
   private String clientId;
 
   @NotNull
-  private ConsumerProperties consumer;
+  private ApplicationProperties.Consumer consumer;
+  @NotNull
+  private ApplicationProperties.Controller controller;
 
 
   @Validated
   @Getter
   @Setter
-  static class ConsumerProperties
+  static class Consumer
   {
     @NotNull
     @NotEmpty
@@ -39,5 +42,15 @@ public class ApplicationProperties
     @NotNull
     @NotEmpty
     private String headerPrefix;
+  }
+
+  @Validated
+  @Getter
+  @Setter
+  static class Controller
+  {
+    @NotNull
+    @NotEmpty
+    private MediaType mediaType;
   }
 }
