@@ -59,6 +59,23 @@ public class ApplicationTests
     assertThat(JsonPath.parse(response.getBody()).read("$.status", String.class)).isEqualTo("UP");
   }
 
+  @DisplayName("Existing offset")
+  @ParameterizedTest(name = "partition: {0}")
+  @FieldSource("PARTITIONS")
+  void testExistingOffset(int partition) throws Exception
+  {
+    String key = Integer.toString(partition);
+    String value = "Hallo Welt! -- " + partition;
+    RecordMetadata recordMetadata = send(partition, key, value);
+    ResponseEntity<String> response = restTemplate.getForEntity(
+      "/{partition}/{offset}",
+      String.class,
+      recordMetadata.partition(),
+      recordMetadata.offset());
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(HttpStatus.OK.value()));
+    assertThat(response.getBody()).isEqualTo(value);
+  }
+
   @DisplayName("Not yet existing offset")
   @ParameterizedTest(name = "partition: {0}")
   @FieldSource("PARTITIONS")
