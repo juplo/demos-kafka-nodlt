@@ -9,7 +9,7 @@ import java.util.concurrent.CompletableFuture;
 public record FetchRequest(
   TopicPartition partition,
   long offset,
-  CompletableFuture<ConsumerRecord<String, String>> future)
+  CompletableFuture<ConsumerRecord<byte[], byte[]>> future)
 {
   @Override
   public String toString()

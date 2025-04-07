@@ -34,7 +34,7 @@ public class DeadLetterConsumer implements Runnable
   private final int numPartitions;
   private final Queue<FetchRequest>[] pendingFetchRequests;
   private final FetchRequest[] currentFetchRequest;
-  private final Consumer<String, String> consumer;
+  private final Consumer<byte[], byte[]> consumer;
   private final Thread workerThread;
   private final Runnable closeCallback;
 
@@ -45,7 +45,7 @@ public class DeadLetterConsumer implements Runnable
     String clientId,
     String topic,
     String headerPrefix,
-    Consumer<String, String> consumer,
+    Consumer<byte[], byte[]> consumer,
     Runnable closeCallback)
   {
     this.id = clientId;
@@ -88,13 +88,13 @@ public class DeadLetterConsumer implements Runnable
       {
         try
         {
-          ConsumerRecords<String, String> records = consumer.poll(Duration.ofMinutes(1));
+          ConsumerRecords<byte[], byte[]> records = consumer.poll(Duration.ofMinutes(1));
 
           log.info("{} - Received {} messages", id, records.count());
           List<TopicPartition> partitionsToPause = new LinkedList<>();
           for (TopicPartition partition : records.partitions())
           {
-            for (ConsumerRecord<String, String> record : records.records(partition))
+            for (ConsumerRecord<byte[], byte[]> record : records.records(partition))
             {
               log.info(
                 "{} - fetched partition={}-{}, offset={}: {}",
@@ -209,14 +209,14 @@ public class DeadLetterConsumer implements Runnable
     currentFetchRequest[fetchRequest.partition().partition()] = fetchRequest;
     consumer.seek(fetchRequest.partition(), fetchRequest.offset());
   }
-  Mono<ConsumerRecord<String, String>> requestRecord(int partition, long offset)
+  Mono<ConsumerRecord<byte[], byte[]>> requestRecord(int partition, long offset)
   {
     if (partition >= numPartitions || partition < 0)
     {
       throw new NonExistentPartitionException(topic, partition);
     }
 
-    CompletableFuture<ConsumerRecord<String, String>> future = new CompletableFuture<>();
+    CompletableFuture<ConsumerRecord<byte[], byte[]>> future = new CompletableFuture<>();
 
     FetchRequest fetchRequest = new FetchRequest(
       new TopicPartition(topic, partition),

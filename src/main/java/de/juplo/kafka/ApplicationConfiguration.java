@@ -2,6 +2,7 @@ package de.juplo.kafka;
 
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.serialization.ByteArrayDeserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -17,7 +18,7 @@ public class ApplicationConfiguration
 {
   @Bean
   public DeadLetterConsumer deadLetterConsumer(
-    Consumer<String, String> kafkaConsumer,
+    Consumer<byte[], byte[]> kafkaConsumer,
     ApplicationProperties properties,
     ConfigurableApplicationContext applicationContext)
   {
@@ -31,15 +32,15 @@ public class ApplicationConfiguration
   }
 
   @Bean(destroyMethod = "")
-  public KafkaConsumer<String, String> kafkaConsumer(ApplicationProperties properties)
+  public KafkaConsumer<byte[], byte[]> kafkaConsumer(ApplicationProperties properties)
   {
     Properties props = new Properties();
 
     props.put("bootstrap.servers", properties.getBootstrapServer());
     props.put("client.id", properties.getClientId());
     props.put("group.id", properties.getConsumer().getGroupId());
-    props.put("key.deserializer", StringDeserializer.class.getName());
-    props.put("value.deserializer", StringDeserializer.class.getName());
+    props.put("key.deserializer", ByteArrayDeserializer.class.getName());
+    props.put("value.deserializer", ByteArrayDeserializer.class.getName());
     props.put("enable.auto.commit", false);
     props.put("auto.offset.reset", "none");
 

@@ -29,7 +29,7 @@ public class DeadLetterController
 
 
   @GetMapping(path = "/{partition}/{offset}")
-  public Mono<ResponseEntity<String>> recordAtOffset(
+  public Mono<ResponseEntity<byte[]>> recordAtOffset(
     @PathVariable int partition,
     @PathVariable long offset)
   {
@@ -40,7 +40,7 @@ public class DeadLetterController
         .contentType(mediaType)
         .header(
           deadLetterConsumer.prefixed(DeadLetterConsumer.KEY),
-          UriUtils.encodePathSegment(record.key(), StandardCharsets.UTF_8))
+          UriUtils.encodePathSegment(new String(record.key()), StandardCharsets.UTF_8))
         .header(
           deadLetterConsumer.prefixed(DeadLetterConsumer.TIMESTAMP),
           Long.toString(record.timestamp()))
