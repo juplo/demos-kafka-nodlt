@@ -24,7 +24,8 @@ public class ApplicationConfiguration
     return
       new DeadLetterConsumer(
         properties.getClientId(),
-        properties.getConsumerProperties().getTopic(),
+        properties.getConsumer().getTopic(),
+        properties.getConsumer().getHeaderPrefix(),
         kafkaConsumer,
         () -> applicationContext.close());
   }
@@ -36,7 +37,7 @@ public class ApplicationConfiguration
 
     props.put("bootstrap.servers", properties.getBootstrapServer());
     props.put("client.id", properties.getClientId());
-    props.put("group.id", properties.getConsumerProperties().getGroupId());
+    props.put("group.id", properties.getConsumer().getGroupId());
     props.put("key.deserializer", StringDeserializer.class.getName());
     props.put("value.deserializer", StringDeserializer.class.getName());
     props.put("enable.auto.commit", false);

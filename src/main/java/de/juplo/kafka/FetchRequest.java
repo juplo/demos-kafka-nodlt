@@ -1,5 +1,6 @@
 package de.juplo.kafka;
 
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.TopicPartition;
 
 import java.util.concurrent.CompletableFuture;
@@ -8,7 +9,7 @@ import java.util.concurrent.CompletableFuture;
 public record FetchRequest(
   TopicPartition partition,
   long offset,
-  CompletableFuture<String> future)
+  CompletableFuture<ConsumerRecord<String, String>> future)
 {
   @Override
   public String toString()

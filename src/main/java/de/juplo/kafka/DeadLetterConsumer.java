@@ -30,6 +30,7 @@ public class DeadLetterConsumer implements Runnable
 
   private final String id;
   private final String topic;
+  private final String headerPrefix;
   private final int numPartitions;
   private final Queue<FetchRequest>[] pendingFetchRequests;
   private final FetchRequest[] currentFetchRequest;
@@ -43,11 +44,13 @@ public class DeadLetterConsumer implements Runnable
   public DeadLetterConsumer(
     String clientId,
     String topic,
+    String headerPrefix,
     Consumer<String, String> consumer,
     Runnable closeCallback)
   {
     this.id = clientId;
     this.topic = topic;
+    this.headerPrefix = headerPrefix;
     this.consumer = consumer;
 
     numPartitions = consumer.partitionsFor(topic).size();
@@ -103,7 +106,7 @@ public class DeadLetterConsumer implements Runnable
 
               FetchRequest fetchRequest = currentFetchRequest[record.partition()];
 
-              fetchRequest.future().complete(record.value());
+              fetchRequest.future().complete(record);
               schedulePendingFetchRequest(record.partition()).ifPresentOrElse(
                 (nextFetchRequest) -> scheduleFetchRequest(nextFetchRequest),
                 () ->
@@ -206,14 +209,14 @@ public class DeadLetterConsumer implements Runnable
     currentFetchRequest[fetchRequest.partition().partition()] = fetchRequest;
     consumer.seek(fetchRequest.partition(), fetchRequest.offset());
   }
-  Mono<String> requestRecord(int partition, long offset)
+  Mono<ConsumerRecord<String, String>> requestRecord(int partition, long offset)
   {
     if (partition >= numPartitions || partition < 0)
     {
       throw new NonExistentPartitionException(topic, partition);
     }
 
-    CompletableFuture<String> future = new CompletableFuture<>();
+    CompletableFuture<ConsumerRecord<String, String>> future = new CompletableFuture<>();
 
     FetchRequest fetchRequest = new FetchRequest(
       new TopicPartition(topic, partition),
@@ -234,7 +237,7 @@ public class DeadLetterConsumer implements Runnable
 
   String prefixed(String headerName)
   {
-    return headerName;
+    return headerPrefix + headerName;
   }
 
   public void shutdown() throws InterruptedException

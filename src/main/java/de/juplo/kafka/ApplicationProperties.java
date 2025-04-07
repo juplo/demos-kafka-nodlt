@@ -25,12 +25,6 @@ public class ApplicationProperties
   private ConsumerProperties consumer;
 
 
-  public ConsumerProperties getConsumerProperties()
-  {
-    return consumer;
-  }
-
-
   @Validated
   @Getter
   @Setter
@@ -42,5 +36,8 @@ public class ApplicationProperties
     @NotNull
     @NotEmpty
     private String topic;
+    @NotNull
+    @NotEmpty
+    private String headerPrefix;
   }
 }

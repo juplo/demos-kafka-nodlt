@@ -4,6 +4,7 @@ juplo:
   consumer:
     group-id: nodlt
     topic: test
+    header-prefix: X-RECORD-
 management:
   endpoint:
     shutdown:
