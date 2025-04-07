@@ -28,6 +28,7 @@ import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -76,6 +77,14 @@ public class ApplicationTests
       recordMetadata.offset());
     assertThat(response.getStatusCode())
       .isEqualTo(HttpStatusCode.valueOf(HttpStatus.OK.value()));
+    assertThat(response.getHeaders().toSingleValueMap())
+      .containsEntry(
+        deadLetterConsumer.prefixed(DeadLetterConsumer.KEY),
+        key);
+    assertThat(response.getHeaders().toSingleValueMap())
+      .containsEntry(
+        deadLetterConsumer.prefixed(DeadLetterConsumer.TIMESTAMP),
+        Long.toString(recordMetadata.timestamp()));
     assertThat(response.getBody())
       .isEqualTo(value);
   }
@@ -127,6 +136,8 @@ public class ApplicationTests
   AdminClient adminClient;
   @Autowired
   TestRestTemplate restTemplate;
+  @Autowired
+  DeadLetterConsumer deadLetterConsumer;
 
   final long[] currentOffsets = new long[NUM_PARTITIONS];
 

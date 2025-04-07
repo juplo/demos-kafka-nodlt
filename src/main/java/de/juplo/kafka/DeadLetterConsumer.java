@@ -24,6 +24,10 @@ import java.util.stream.IntStream;
 @Slf4j
 public class DeadLetterConsumer implements Runnable
 {
+  public final static String KEY = "KEY";
+  public final static String TIMESTAMP = "TIMESTAMP";
+
+
   private final String id;
   private final String topic;
   private final int numPartitions;
@@ -226,6 +230,11 @@ public class DeadLetterConsumer implements Runnable
     consumer.wakeup();
 
     return Mono.fromFuture(future);
+  }
+
+  String prefixed(String headerName)
+  {
+    return headerName;
   }
 
   public void shutdown() throws InterruptedException
