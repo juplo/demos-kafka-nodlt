@@ -42,6 +42,7 @@ public class ApplicationConfiguration
     props.put("value.deserializer", ByteArrayDeserializer.class.getName());
     props.put("enable.auto.commit", false);
     props.put("auto.offset.reset", "none");
+    props.put("fetch.max.wait.ms", 0);
 
     return new KafkaConsumer<>(props);
   }
