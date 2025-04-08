@@ -36,8 +36,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static de.juplo.kafka.ApplicationTests.NUM_PARTITIONS;
-import static de.juplo.kafka.ApplicationTests.TOPIC;
+import static de.juplo.kafka.ApplicationTests.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
@@ -46,6 +45,7 @@ import static org.assertj.core.api.Assertions.assertThat;
   properties = {
     "juplo.bootstrap-server=${spring.embedded.kafka.brokers}",
     "juplo.consumer.topic=" + TOPIC,
+    "juplo.consumer.header-prefix=" + HEADER_PREFIX,
     "spring.kafka.producer.key-serializer=org.apache.kafka.common.serialization.ByteArraySerializer",
     "spring.kafka.producer.value-serializer=org.apache.kafka.common.serialization.ByteArraySerializer",
     "logging.level.de.juplo.kafka=TRACE",
@@ -111,11 +111,11 @@ public class ApplicationTests
       .isEqualTo(HttpStatusCode.valueOf(HttpStatus.OK.value()));
     assertThat(response.getHeaders().toSingleValueMap())
       .containsEntry(
-        deadLetterConsumer.prefixed(DeadLetterConsumer.KEY),
+        HEADER_PREFIX + DeadLetterConsumer.KEY,
         key);
     assertThat(response.getHeaders().toSingleValueMap())
       .containsEntry(
-        deadLetterConsumer.prefixed(DeadLetterConsumer.TIMESTAMP),
+        HEADER_PREFIX + DeadLetterConsumer.TIMESTAMP,
         Long.toString(recordMetadata.timestamp()));
     assertThat(response.getBody())
       .isEqualTo(value);
@@ -161,6 +161,7 @@ public class ApplicationTests
   static final String TOPIC = "ExampleConsumerTest_TEST";
   static final int NUM_PARTITIONS = 7;
   static final int[] PARTITIONS = IntStream.range(0, NUM_PARTITIONS).toArray();
+  static final String HEADER_PREFIX = "X-FOO--";
 
   @Autowired
   KafkaTemplate<byte[], byte[]> kafkaTemplate;
@@ -168,8 +169,6 @@ public class ApplicationTests
   AdminClient adminClient;
   @Autowired
   TestRestTemplate restTemplate;
-  @Autowired
-  DeadLetterConsumer deadLetterConsumer;
 
   final long[] currentOffsets = new long[NUM_PARTITIONS];
 
