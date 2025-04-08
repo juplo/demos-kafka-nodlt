@@ -15,8 +15,14 @@ import java.nio.charset.StandardCharsets;
 @RestController
 public class DeadLetterController
 {
+  public final static String KEY = "KEY";
+  public final static String TIMESTAMP = "TIMESTAMP";
+
+
   private final DeadLetterConsumer deadLetterConsumer;
   private final MediaType mediaType;
+  private final String headerPrefix;
+
 
 
   public DeadLetterController(
@@ -25,6 +31,7 @@ public class DeadLetterController
   {
     this.deadLetterConsumer = deadLetterConsumer;
     this.mediaType = properties.getController().getMediaType();
+    this.headerPrefix = properties.getController().getHeaderPrefix();
   }
 
 
@@ -39,13 +46,19 @@ public class DeadLetterController
         .ok()
         .contentType(mediaType)
         .header(
-          deadLetterConsumer.prefixed(DeadLetterConsumer.KEY),
+          prefixed(KEY),
           UriUtils.encodePathSegment(new String(record.key()), StandardCharsets.UTF_8))
         .header(
-          deadLetterConsumer.prefixed(DeadLetterConsumer.TIMESTAMP),
+          prefixed(TIMESTAMP),
           Long.toString(record.timestamp()))
         .body(record.value()));
   }
+
+  String prefixed(String headerName)
+  {
+    return headerPrefix + headerName;
+  }
+
 
   @ResponseStatus(value= HttpStatus.NOT_FOUND)
   @ExceptionHandler(OffsetOutOfRangeException.class)

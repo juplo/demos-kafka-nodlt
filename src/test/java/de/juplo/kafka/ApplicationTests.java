@@ -45,7 +45,7 @@ import static org.assertj.core.api.Assertions.assertThat;
   properties = {
     "juplo.bootstrap-server=${spring.embedded.kafka.brokers}",
     "juplo.consumer.topic=" + TOPIC,
-    "juplo.consumer.header-prefix=" + HEADER_PREFIX,
+    "juplo.controller.header-prefix=" + HEADER_PREFIX,
     "spring.kafka.producer.key-serializer=org.apache.kafka.common.serialization.ByteArraySerializer",
     "spring.kafka.producer.value-serializer=org.apache.kafka.common.serialization.ByteArraySerializer",
     "logging.level.de.juplo.kafka=TRACE",
@@ -111,11 +111,11 @@ public class ApplicationTests
       .isEqualTo(HttpStatusCode.valueOf(HttpStatus.OK.value()));
     assertThat(response.getHeaders().toSingleValueMap())
       .containsEntry(
-        HEADER_PREFIX + DeadLetterConsumer.KEY,
+        HEADER_PREFIX + DeadLetterController.KEY,
         key);
     assertThat(response.getHeaders().toSingleValueMap())
       .containsEntry(
-        HEADER_PREFIX + DeadLetterConsumer.TIMESTAMP,
+        HEADER_PREFIX + DeadLetterController.TIMESTAMP,
         Long.toString(recordMetadata.timestamp()));
     assertThat(response.getBody())
       .isEqualTo(value);

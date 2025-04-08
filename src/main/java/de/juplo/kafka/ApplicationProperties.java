@@ -39,9 +39,6 @@ public class ApplicationProperties
     @NotNull
     @NotEmpty
     private String topic;
-    @NotNull
-    @NotEmpty
-    private String headerPrefix;
   }
 
   @Validated
@@ -52,5 +49,8 @@ public class ApplicationProperties
     @NotNull
     @NotEmpty
     private MediaType mediaType;
+    @NotNull
+    @NotEmpty
+    private String headerPrefix;
   }
 }

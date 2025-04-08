@@ -26,7 +26,6 @@ public class ApplicationConfiguration
       new DeadLetterConsumer(
         properties.getClientId(),
         properties.getConsumer().getTopic(),
-        properties.getConsumer().getHeaderPrefix(),
         kafkaConsumer,
         () -> applicationContext.close());
   }

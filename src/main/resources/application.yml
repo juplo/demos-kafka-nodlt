@@ -4,8 +4,8 @@ juplo:
   consumer:
     group-id: nodlt
     topic: test
-    header-prefix: X-RECORD-
   controller:
+    header-prefix: X-RECORD-
     media-type: application/json
 management:
   endpoint:
