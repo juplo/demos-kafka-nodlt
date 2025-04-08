@@ -49,14 +49,14 @@ public class DeadLetterController
 
         builder.header(
           prefixed(KEY),
-          UriUtils.encodePathSegment(new String(record.key()), StandardCharsets.UTF_8));
+          encode(new String(record.key())));
         builder.header(
           prefixed(TIMESTAMP),
           Long.toString(record.timestamp()));
 
         record.headers().forEach(header -> builder.header(
-          UriUtils.encodePathSegment(prefixed(header.key()), StandardCharsets.UTF_8),
-          UriUtils.encodePathSegment(new String(header.value(), StandardCharsets.UTF_8), StandardCharsets.UTF_8)));
+          encode(prefixed(header.key())),
+          encode(header.value())));
 
         return builder.body(record.value());
       });
@@ -67,6 +67,15 @@ public class DeadLetterController
     return headerPrefix + headerName;
   }
 
+  String encode(byte[] bytes)
+  {
+    return encode(new String(bytes, StandardCharsets.UTF_8));
+  }
+
+  String encode(String string)
+  {
+    return UriUtils.encodePathSegment(string, StandardCharsets.UTF_8);
+  }
 
   @ResponseStatus(value= HttpStatus.NOT_FOUND)
   @ExceptionHandler(OffsetOutOfRangeException.class)
