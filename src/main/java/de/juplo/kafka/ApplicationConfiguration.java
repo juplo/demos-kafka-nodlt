@@ -2,7 +2,6 @@ package de.juplo.kafka;
 
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.clients.consumer.StickyAssignor;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -46,7 +45,6 @@ public class ApplicationConfiguration
       props.put("auto.commit.interval", properties.getConsumerProperties().getAutoCommitInterval());
     }
     props.put("metadata.max.age.ms", 5000); //  5 Sekunden
-    props.put("partition.assignment.strategy", StickyAssignor.class.getName());
     props.put("key.deserializer", StringDeserializer.class.getName());
     props.put("value.deserializer", StringDeserializer.class.getName());
 
