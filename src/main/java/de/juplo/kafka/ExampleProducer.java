@@ -63,7 +63,7 @@ public class ExampleProducer
 
   void send(String key, String value)
   {
-    final long time = System.currentTimeMillis();
+    final long sendRequested = System.currentTimeMillis();
 
     final ProducerRecord<String, String> record = new ProducerRecord<>(
       topic,  // Topic
@@ -73,7 +73,7 @@ public class ExampleProducer
 
     producer.send(record, (metadata, e) ->
     {
-      long now = System.currentTimeMillis();
+      long sendRequestProcessed = System.currentTimeMillis();
       if (e == null)
       {
         // HANDLE SUCCESS
@@ -85,7 +85,7 @@ public class ExampleProducer
           metadata.partition(),
           metadata.offset(),
           metadata.timestamp(),
-          now - time
+          sendRequestProcessed - sendRequested
         );
       }
       else
@@ -96,20 +96,20 @@ public class ExampleProducer
           id,
           key,
           value,
-          now - time,
+          sendRequestProcessed - sendRequested,
           e.toString()
         );
       }
     });
 
-    long now = System.currentTimeMillis();
+    long sendRequestQueued = System.currentTimeMillis();
     produced++;
     log.trace(
       "{} - Queued message {}={}, latency={}ms",
       id,
       key,
       value,
-      now - time
+      sendRequestQueued - sendRequested
     );
   }
 
