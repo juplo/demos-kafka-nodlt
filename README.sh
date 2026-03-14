@@ -1,6 +1,6 @@
 #!/bin/bash
 
-IMAGE=juplo/simple-producer:1.0-SNAPSHOT
+IMAGE=juplo/simple-consumer:1.0-SNAPSHOT
 
 if [ "$1" = "cleanup" ]
 then
@@ -10,7 +10,7 @@ then
 fi
 
 docker compose -f docker/docker-compose.yml up -d --remove-orphans kafka-1 kafka-2 kafka-3
-docker compose -f docker/docker-compose.yml rm -svf producer
+docker compose -f docker/docker-compose.yml rm -svf consumer
 
 if [[
   $(docker image ls -q $IMAGE) == "" ||
@@ -27,10 +27,13 @@ docker compose -f docker/docker-compose.yml up --remove-orphans setup || exit 1
 
 
 docker compose -f docker/docker-compose.yml up -d producer
+docker compose -f docker/docker-compose.yml up -d consumer
+
+sleep 5
+docker compose -f docker/docker-compose.yml stop consumer
+
+docker compose -f docker/docker-compose.yml start consumer
 sleep 5
 
-docker compose -f docker/docker-compose.yml exec cli kafkacat -b kafka:9092 -t test -c 20 -f'topic=%t\tpartition=%p\toffset=%o\tkey=%k\tvalue=%s\n'
-
-docker compose -f docker/docker-compose.yml stop producer
-docker compose -f docker/docker-compose.yml exec cli kafkacat -b kafka:9092 -t test -e -f'topic=%t\tpartition=%p\toffset=%o\tkey=%k\tvalue=%s\n'
-docker compose -f docker/docker-compose.yml logs producer
+docker compose -f docker/docker-compose.yml stop producer consumer
+docker compose -f docker/docker-compose.yml logs consumer

@@ -1,143 +1,123 @@
 package de.juplo.kafka;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.producer.Producer;
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.serialization.StringSerializer;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.Consumer;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.errors.WakeupException;
+import org.apache.kafka.common.serialization.StringDeserializer;
 
+import java.time.Duration;
+import java.util.Arrays;
 import java.util.Properties;
 
 
 @Slf4j
-public class ExampleProducer
+public class ExampleConsumer
 {
   private final String id;
   private final String topic;
-  private final Producer<String, String> producer;
+  private final Consumer<String, String> consumer;
 
-  private volatile boolean running = true;
-  private volatile boolean done = false;
-  private long produced = 0;
+  private volatile boolean running = false;
+  private long consumed = 0;
 
-  public ExampleProducer(
+  public ExampleConsumer(
     String broker,
     String topic,
+    String groupId,
     String clientId)
   {
     Properties props = new Properties();
     props.put("bootstrap.servers", broker);
+    props.put("group.id", groupId); // ID für die Offset-Commits
     props.put("client.id", clientId); // Nur zur Wiedererkennung
-    props.put("key.serializer", StringSerializer.class.getName());
-    props.put("value.serializer", StringSerializer.class.getName());
+    props.put("auto.offset.reset", "earliest"); // Von Beginn an lesen
+    props.put("partition.assignment.strategy", "org.apache.kafka.clients.consumer.CooperativeStickyAssignor");
+    props.put("key.deserializer", StringDeserializer.class.getName());
+    props.put("value.deserializer", StringDeserializer.class.getName());
 
     this.id = clientId;
     this.topic = topic;
-    producer = new KafkaProducer<>(props);
+    consumer = new KafkaConsumer<>(props);
   }
+
 
   public void run()
   {
-    long i = 0;
-
     try
     {
-      for (; running; i++)
+      log.info("{} - Subscribing to topic {}", id, topic);
+      consumer.subscribe(Arrays.asList(topic));
+      running = true;
+
+      while (true)
       {
-        send(Long.toString(i%10), Long.toString(i));
-        Thread.sleep(500);
+        ConsumerRecords<String, String> records = consumer.poll(Duration.ofSeconds(1));
+
+        log.info("{} - Received {} messages", id, records.count());
+        for (ConsumerRecord<String, String> record : records)
+        {
+          consumed++;
+          log.info(
+            "{} - {}: {}/{} - {}={}",
+            id,
+            record.offset(),
+            record.topic(),
+            record.partition(),
+            record.key(),
+            record.value()
+          );
+        }
       }
     }
-    catch (Exception e)
+    catch(WakeupException e)
     {
-      log.error("{} - Unexpected error!", id, e);
+      log.info("{} - Consumer was signaled to finish its work", id);
+    }
+    catch(Exception e)
+    {
+      log.error("{} - Unexpected error, unsubscribing!", id, e);
+      consumer.unsubscribe();
     }
     finally
     {
-      log.info("{}: Closing the KafkaProducer", id);
-      producer.close();
-      log.info("{}: Produced {} messages in total, exiting!", id, produced);
-      done = true;
+      running = false;
+      log.info("{} - Closing the KafkaConsumer", id);
+      consumer.close();
+      log.info("{}: Consumed {} messages in total, exiting!", id, consumed);
     }
-  }
-
-  void send(String key, String value)
-  {
-    final long sendRequested = System.currentTimeMillis();
-
-    final ProducerRecord<String, String> record = new ProducerRecord<>(
-      topic,  // Topic
-      key,    // Key
-      value   // Value
-    );
-
-    producer.send(record, (metadata, e) ->
-    {
-      long sendRequestProcessed = System.currentTimeMillis();
-      if (e == null)
-      {
-        // HANDLE SUCCESS
-        log.debug(
-          "{} - Sent message {}={}, partition={}, offset={}, timestamp={}, latency={}ms",
-          id,
-          key,
-          value,
-          metadata.partition(),
-          metadata.offset(),
-          metadata.timestamp(),
-          sendRequestProcessed - sendRequested
-        );
-      }
-      else
-      {
-        // HANDLE ERROR
-        log.error(
-          "{} - ERROR for message {}={}, latency={}ms: {}",
-          id,
-          key,
-          value,
-          sendRequestProcessed - sendRequested,
-          e.toString()
-        );
-      }
-    });
-
-    long sendRequestQueued = System.currentTimeMillis();
-    produced++;
-    log.trace(
-      "{} - Queued message {}={}, latency={}ms",
-      id,
-      key,
-      value,
-      sendRequestQueued - sendRequested
-    );
   }
 
 
   public static void main(String[] args) throws Exception
   {
-    if (args.length != 3)
+    String broker = ":9092";
+    String topic = "test";
+    String groupId = "my-group";
+    String clientId = "DEV";
+
+    switch (args.length)
     {
-      log.error("Three arguments required!");
-      log.error("arg[0]: Broker-Address");
-      log.error("arg[1]: Topic");
-      log.error("arg[2]: Unique Client-ID");
-      System.exit(1);
-      return;
+      case 4:
+        clientId = args[3];
+      case 3:
+        groupId = args[2];
+      case 2:
+        topic = args[1];
+      case 1:
+        broker = args[0];
     }
 
-    log.info(
-      "Running ExampleProducer: broker={}, topic={}, client-id={}",
-      args[0],
-      args[1],
-      args[2]);
 
-    ExampleProducer instance = new ExampleProducer(args[0], args[1], args[2]);
+    ExampleConsumer instance = new ExampleConsumer(broker, topic, groupId, clientId);
 
     Runtime.getRuntime().addShutdownHook(new Thread(() ->
     {
-      instance.running = false;
-      while (!instance.done)
+      instance.consumer.wakeup();
+
+      while (instance.running)
       {
         log.info("{} - Waiting for main-thread...", instance.id);
         try
@@ -149,6 +129,12 @@ public class ExampleProducer
       log.info("{} - Shutdown completed.", instance.id);
     }));
 
+    log.info(
+      "Running ExampleConsumer: broker={}, topic={}, group-id={}, client-id={}",
+      broker,
+      topic,
+      groupId,
+      clientId);
     instance.run();
   }
 }

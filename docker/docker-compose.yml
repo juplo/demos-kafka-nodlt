@@ -179,6 +179,10 @@ services:
     cpu_quota:  50000
     mem_limit:  100m
 
+  consumer:
+    image: juplo/simple-consumer:1.0-SNAPSHOT
+    command: kafka:9092 test my-group consumer
+
 volumes:
   controller-data:
   kafka-1-data:
