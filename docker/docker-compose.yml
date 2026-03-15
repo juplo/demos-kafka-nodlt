@@ -175,6 +175,9 @@ services:
   producer:
     image: juplo/simple-producer:1.0-SNAPSHOT
     command: kafka:9092 test producer
+    cpu_period: 100000
+    cpu_quota:  50000
+    mem_limit:  100m
 
 volumes:
   controller-data:
