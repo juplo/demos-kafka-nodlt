@@ -39,6 +39,7 @@ public class ApplicationConfiguration
     props.put("group.id", properties.getConsumerProperties().getGroupId());
     props.put("key.deserializer", StringDeserializer.class.getName());
     props.put("value.deserializer", StringDeserializer.class.getName());
+    props.put("enable.auto.commit", false);
     props.put("auto.offset.reset", "none");
 
     return new KafkaConsumer<>(props);
