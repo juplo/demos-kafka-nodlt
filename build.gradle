@@ -38,6 +38,8 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-kafka-test'
+	testImplementation 'org.springframework.boot:spring-boot-restclient'
+	testImplementation 'org.springframework.boot:spring-boot-resttestclient'
 	testImplementation 'com.jayway.jsonpath:json-path'
 	testCompileOnly 'org.projectlombok:lombok'
 	testAnnotationProcessor 'org.projectlombok:lombok'
