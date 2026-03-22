@@ -139,14 +139,14 @@ public class ExampleProducer
       instance.running = false;
       while (!instance.done)
       {
-        log.info("Waiting for main-thread...");
+        log.info("{} - Waiting for main-thread...", instance.id);
         try
         {
           Thread.sleep(1000);
         }
         catch (InterruptedException e) {}
       }
-      log.info("Shutdown completed.");
+      log.info("{} - Shutdown completed.", instance.id);
     }));
 
     instance.run();
